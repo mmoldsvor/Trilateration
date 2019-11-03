@@ -7,6 +7,8 @@ import collections
 
 
 class Node:
+    DEFAULT_DISTANCE = 300
+
     def __init__(self, position, serial_port, filter_sample=1):
         """
         A Node network element
@@ -41,15 +43,23 @@ class Node:
             except ValueError:
                 print('INITIALIZING')
 
+    def filter_data(self):
+        """
+        Filters data points into a single useable value
+        :return: int, distance if data points are present, None otherwise
+        """
+        if len(self.data_points) > 0:
+            return sum(self.data_points) / len(self.data_points)
+        return None
+
     def update_distance(self):
         """
         Updates distance and performs filtering in MainThread to avoid unnecessary workload on SerialThread
         """
         if self.serial is not None:
-            if len(self.data_points) > 0:
-                self.distance = sum(self.data_points)/len(self.data_points)
+            self.distance = self.filter_data()
         else:
-            self.distance = 300
+            self.distance = Node.DEFAULT_DISTANCE
 
     @staticmethod
     def intersection(node1, node2):
