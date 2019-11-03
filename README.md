@@ -1,2 +1,2 @@
 # Trilateration
-An Open Source Trilateration Library for both RSSI and Distance to Position calculation
+A Trilateration Library for both RSSI and Distance to Position calculation
