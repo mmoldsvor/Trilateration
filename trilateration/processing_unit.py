@@ -6,7 +6,7 @@ class ProcessingUnit:
     def __init__(self, nodes, tracking_area):
         """
         Handles all incoming data
-        :param nodes: Node -
+        :param nodes: List[Node, Node, ...] -
         :param tracking_area: tuple(x1, y1, x2, y2) - The area where positions can appear
         """
         self.nodes = nodes
