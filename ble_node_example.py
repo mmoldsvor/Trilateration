@@ -6,6 +6,7 @@ class BLENode(Node):
         """
         A Node which supports BLE and rssi to distance conversion
         :param measured_power: The RSSI measured at 1 meter
+        :param environmental_constant: int, Environmental factor normally in the range of [2, 4]
         """
         super().__init__(position, connection, default_distance)
         self.measured_power = measured_power
@@ -36,7 +37,6 @@ class BLENode(Node):
         """
         Converts from rssi to distance
         :param rssi: int, current RSSI
-        :param constant: int, Environmental factor normally in the range of [2, 4]
         :return: int, distance measured in meters
         """
         return 10 ** ((self.measured_power - rssi) / (10 * self.environmental_constant))
