@@ -1,4 +1,4 @@
-from .vector2D import Vector2D
+from trilateration.vector2D import Vector2D
 
 import math
 import serial
@@ -6,28 +6,22 @@ import threading
 import collections
 
 
-class Node:
-    DEFAULT_DISTANCE = 300
-
-    def __init__(self, position, serial_port, filter_sample=1):
-        """
-        A Node network element
-        :param position: Vector2D - The position of the Node in relation to the top left corner in centimeters
-        :param serial_port: str - Serial port to read data from
-        :param filter_sample: int - The amount of data points to sample when filtering distance
-        """
-        self.position = position
-        self.distance = 0
-
+class ConnectionHandler:
+    def __init__(self, filter_sample):
         self.filter_sample = filter_sample
         self.data_points = collections.deque([], filter_sample)
+        self.connected = False
 
-        self.serial_port = serial_port
+
+class SerialConnection(ConnectionHandler):
+    def __init__(self, serial_port, baud_rate, filter_sample=1):
+        super().__init__(filter_sample)
 
         try:
             # Starts a serial thread if the serial port is available
-            self.serial = serial.Serial(serial_port, baudrate=115200)
+            self.serial = serial.Serial(serial_port, baudrate=baud_rate)
             threading.Thread(target=self.serial_thread).start()
+            self.connected = True
         except serial.serialutil.SerialException as ex:
             self.serial = None
             print(ex)
@@ -43,23 +37,37 @@ class Node:
             except ValueError:
                 print('INITIALIZING')
 
+
+class Node:
+    def __init__(self, position, connection, default_distance=100):
+        """
+        A Node network element
+        :param position: Vector2D - The position of the Node in relation to the top left corner in centimeters
+        :param connection: ConnectionHandler - The type of connection to read data from
+        """
+        self.position = position
+        self.connection = connection
+        self.default_distance = default_distance
+
+        self.distance = 0
+
     def filter_data(self):
         """
         Filters data points into a single useable value
         :return: int, distance if data points are present, None otherwise
         """
-        if len(self.data_points) > 0:
-            return sum(self.data_points) / len(self.data_points)
-        return None
+        if len(self.connection.data_points) > 0:
+            return sum(self.connection.data_points) / len(self.connection.data_points)
+        return 0
 
     def update_distance(self):
         """
         Updates distance and performs filtering in MainThread to avoid unnecessary workload on SerialThread
         """
-        if self.serial is not None:
+        if self.connection.connected:
             self.distance = self.filter_data()
         else:
-            self.distance = Node.DEFAULT_DISTANCE
+            self.distance = self.default_distance
 
     @staticmethod
     def intersection(node1, node2):
