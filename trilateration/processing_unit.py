@@ -1,5 +1,5 @@
-from .node import Node
-from .vector2D import Vector2D
+from trilateration.node import Node
+from trilateration.vector2D import Vector2D
 
 
 class ProcessingUnit:
