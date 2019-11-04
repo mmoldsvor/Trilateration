@@ -2,7 +2,7 @@ from trilateration import Node
 
 
 class BLENode(Node):
-    def __init__(self, position, connection, measured_power, default_distance=100):
+    def __init__(self, position, connection, measured_power=-50, default_distance=100):
         """
         A Node which supports BLE and rssi to distance conversion
         :param measured_power: The RSSI measured at 1 meter
@@ -27,7 +27,7 @@ class BLENode(Node):
         """
         if self.connection.connected:
             filtered_data = self.filter_data()
-            self.distance = self.rssi_to_distance(self.measured_power, filtered_data, 2)
+            self.distance = self.rssi_to_distance(filtered_data, 2)
         else:
             self.distance = self.default_distance
 

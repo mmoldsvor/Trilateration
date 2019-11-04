@@ -3,15 +3,20 @@ from trilateration.vector2D import Vector2D
 
 
 class ProcessingUnit:
-    def __init__(self, nodes, tracking_area):
+    def __init__(self, nodes, tracking_area, algorithm_function=None):
         """
         Handles all incoming data
         :param nodes: List[Node, Node, ...] -
         :param tracking_area: tuple(x1, y1, x2, y2) - The area where positions can appear
+        :param algorithm_function: func, a function that takes all intersections, and finds most likely position
         """
         self.nodes = nodes
         self.tracking_area = tracking_area
-        self.position_generator = self.calculate_position()
+
+        if algorithm_function is not None:
+            self.position_generator = self.calculate_position(algorithm_function)
+        else:
+            self.position_generator = self.calculate_position(self.default_algorithm)
 
     @property
     def position(self):
@@ -27,19 +32,14 @@ class ProcessingUnit:
             return next_position
         return None
 
-    def calculate_position(self):
+    def calculate_position(self, algorithm_function):
         """
         Calculates the average position of the intersections in the tracked area
         :yield: Vector2D(x, y) - yields the position whenever it is available
         """
         while True:
             intersections = self.calculate_intersections()
-            points_of_interest = self.compare_points(intersections)
-            if not points_of_interest == []:
-                point = Vector2D.average_vector(points_of_interest)
-                yield point
-            else:
-                yield None
+            yield algorithm_function(intersections)
 
     def calculate_intersections(self):
         """
@@ -78,7 +78,7 @@ class ProcessingUnit:
 
         result = []
         for index, point1 in enumerate(points):
-            for point2 in points[index+1:]:
+            for point2 in points[index + 1:]:
                 for point in ProcessingUnit.closest_points(point1, point2):
                     result.append(point)
         return set(tuple(result))
@@ -95,8 +95,16 @@ class ProcessingUnit:
         points = []
         for point1 in points1:
             for point2 in points2:
-                dist = abs(point1-point2)
+                dist = abs(point1 - point2)
                 if min_dist is None or dist < min_dist:
                     min_dist = dist
                     points = [point1, point2]
         return points
+
+    def default_algorithm(self, intersections):
+        points_of_interest = self.compare_points(intersections)
+        if not points_of_interest == []:
+            point = Vector2D.average_vector(points_of_interest)
+            return point
+        else:
+            return None
