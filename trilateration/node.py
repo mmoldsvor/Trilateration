@@ -33,7 +33,7 @@ class SerialConnection(ConnectionHandler):
         """
         while True:
             try:
-                self.data_points.appendleft(int(self.serial.readline()))
+                self.data_points.appendleft(float(self.serial.readline()))
             except ValueError:
                 print('INITIALIZING')
 

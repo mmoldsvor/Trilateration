@@ -2,14 +2,6 @@ from trilateration import Node
 
 
 class BLENode(Node):
-    def serial_thread(self):
-        while True:
-            try:
-                # Reads RSSI from serial
-                self.data_points.appendleft(int(self.serial.readline()))
-            except ValueError:
-                print('INITIALIZING')
-
     def filter_data(self):
         """
         Filters data points into a single usable value
@@ -17,19 +9,19 @@ class BLENode(Node):
         """
         # Add kalman or other filter here
         # Currently using average filter
-        if len(self.data_points) > 0:
-            return sum(self.data_points) / len(self.data_points)
-        return None
+        if len(self.connection.data_points) > 0:
+            return sum(self.connection.data_points) / len(self.connection.data_points)
+        return 0
 
     def update_distance(self):
         """
         Updates distance and performs filtering in MainThread to avoid unnecessary workload on SerialThread
         """
-        if self.serial is not None:
+        if self.connection.connected:
             filtered_data = self.filter_data()
             self.distance = self.rssi_to_distance(-50, filtered_data, 2)
         else:
-            self.distance = Node.DEFAULT_DISTANCE
+            self.distance = self.default_distance
 
     @staticmethod
     def rssi_to_distance(measured_power, rssi, constant=3):
