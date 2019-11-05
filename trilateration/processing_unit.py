@@ -16,7 +16,7 @@ class ProcessingUnit:
         if algorithm_function is not None:
             self.position_generator = self.calculate_position(algorithm_function)
         else:
-            self.position_generator = self.calculate_position(self.default_algorithm)
+            self.position_generator = self.calculate_position(ProcessingUnit.default_algorithm)
 
     @property
     def position(self):
@@ -101,8 +101,9 @@ class ProcessingUnit:
                     points = [point1, point2]
         return points
 
-    def default_algorithm(self, intersections):
-        points_of_interest = self.compare_points(intersections)
+    @staticmethod
+    def default_algorithm(intersections):
+        points_of_interest = ProcessingUnit.compare_points(intersections)
         if not points_of_interest == []:
             point = Vector2D.average_vector(points_of_interest)
             return point
