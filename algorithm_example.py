@@ -1,12 +1,13 @@
 from trilateration import Node, ProcessingUnit, Vector2D, SerialConnection
 
 
-def pick_first(intersections):
+def pick_first(processing_unit):
     """
     DO NOT USE FOR POSITIONING
     Just a basic algorithm that picks the first intersection it can find
     :return: Vector()
     """
+    intersections = processing_unit.calculate_intersections()
     return intersections[0]
 
 

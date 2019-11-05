@@ -38,8 +38,7 @@ class ProcessingUnit:
         :yield: Vector2D(x, y) - yields the position whenever it is available
         """
         while True:
-            intersections = self.calculate_intersections()
-            yield algorithm_function(intersections)
+            yield algorithm_function(self)
 
     def calculate_intersections(self):
         """
@@ -101,8 +100,8 @@ class ProcessingUnit:
                     points = [point1, point2]
         return points
 
-    @staticmethod
-    def default_algorithm(intersections):
+    def default_algorithm(self):
+        intersections = self.calculate_intersections()
         points_of_interest = ProcessingUnit.compare_points(intersections)
         if not points_of_interest == []:
             point = Vector2D.average_vector(points_of_interest)
