@@ -1,5 +1,5 @@
 from trilateration import *
-from visualizer import AnalysisTool
+from examples.visualizer import AnalysisTool
 
 node_left = Node(Vector2D(100, 100), SerialConnection('COM9', 38400, 20))
 node_right = Node(Vector2D(400, 100), SerialConnection('COM13', 38400, 20))
